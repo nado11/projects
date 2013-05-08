@@ -1,0 +1,338 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>pixi.js example 2 loading a sprite sheet</title>
+	
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+		}
+	</style>
+	
+	<script src="pixi.js"></script>
+</head>
+<body>
+ <audio id="music1"  src="toystory.wav" preload="auto"></audio>
+ <img id="image" src="mute.png" style="position:absolute; top:150px ; right:100px; " height="50" width="100" onclick="mutesound()" ;>
+ <div id="Pause">
+<img  src="pause.png" alt="mm" height="40" width="40" onclick="Pause();">
+
+</div>
+
+	<script>
+	
+	var count = 0;
+	var aliens = [];
+	var balls = [];
+	var mute = 1;
+    var lives = 3;	
+	// create an array of assets to load
+	var assetsToLoader = [ "SpriteSheet.json"];
+	
+	// create a new loader
+	loader = new PIXI.AssetLoader(assetsToLoader);
+	
+	// use callback
+	loader.onComplete = onAssetsLoaded
+	
+	//begin load
+	loader.load();
+	
+	
+	// holder to store aliens
+	
+	var interactive = true;
+
+	// create an new instance of a pixi stage
+	var stage = new PIXI.Stage(0xFFFFFF,true);
+	
+	// create a renderer instance.
+	renderer = PIXI.autoDetectRenderer(1400, 800);
+		
+	// add the renderer view element to the DOM
+	document.body.appendChild(renderer.view);
+	
+	// create an empty container
+var motion= true;
+var playing= 1;
+function Pause(){
+if(playing == 1){
+motion= false;
+playing= 0 ;
+}else{
+motion= true;
+playing = 1;
+}
+}
+
+	
+	var music=document.getElementById("music1");
+	music.autoplay=true;
+	music.load();
+	music.loop=true;
+	
+	 function mutesound() {
+                if (mute == 1) {
+	                        
+                music.pause();	
+	            mute = 0;
+                } else {
+                    
+               music.play();
+	                    mute = 1;
+                }
+            }
+	var texture = PIXI.Texture.fromImage("spaceship.png"); 
+	
+	
+	var SpaceShip = new PIXI.Sprite(texture);
+	
+	
+	SpaceShip.anchor.x = 0.5;
+	SpaceShip.anchor.y = 0.5;
+	
+	SpaceShip.scale.x = 0.15;
+	SpaceShip.scale.y = 0.15;
+	
+	var x=0;
+	var y=0;
+	
+	
+	SpaceShip.position.x = x;
+	SpaceShip.position.y = y;  
+	
+	var texture = PIXI.Texture.fromImage("sky.jpg"); 
+	
+	var sky = new PIXI.Sprite(texture);
+	
+	
+	sky.anchor.x = 0.5;
+	sky.anchor.y = 0.5;
+	
+	sky.scale.x = 0.7;
+	sky.scale.y = 0.55;
+	
+	var x=0;
+	var y=0;
+	
+	
+	
+	sky.position.x = x;
+	sky.position.y = y;  
+	
+	var texture3 = PIXI.Texture.fromImage("shooting balls.jpg"); 
+	 
+	
+	
+	var texture2 = PIXI.Texture.fromImage("alien.png"); 
+	var explosion = PIXI.Texture.fromImage("bom.png");
+	
+	
+	
+	//ADD SKY FIRST
+	stage.addChild(sky);
+	
+
+	
+	setInterval(create_alien,2000);
+	SpaceShip.setInteractive(true);
+	
+	PIXI.InteractionManager.prototype.onMouseMove = function(event) {
+	    
+		if(motion)
+		{
+		SpaceShip.position.x = event.pageX;
+	    SpaceShip.position.y = event.pageY;
+		}
+		else
+		{
+		SpaceShip.position.x = positionX;
+		}
+		
+	}
+	PIXI.InteractionManager.prototype.onMouseDown = function(event) {
+	    
+		shooting_balls();
+		
+	}
+	
+
+	function create_alien() {
+	
+
+var alien = new PIXI.Sprite(texture2);
+alien.position.x = Math.random()*1400 ;
+alien.position.y = 0 
+
+alien.anchor.x = 0.5;
+alien.anchor.y = 0.5;
+alien.scale.x = 0.4;
+alien.scale.y = 0.4;
+aliens.push(alien);
+//alert(i);
+stage.addChild(alien);
+
+}
+
+
+
+function shooting_balls() {
+
+
+var ball = new PIXI.Sprite(texture3);
+ball.position.x = SpaceShip.position.x;
+ball.position.y = SpaceShip.position.y;
+
+ball.anchor.x = 0.5;
+ball.anchor.y = 0.5;
+
+ball.scale.x = 0.1;
+ball.scale.y = 0.1;
+balls.push(ball);
+//alert(i);
+stage.addChild(ball);
+
+}
+
+
+	function onAssetsLoaded()
+	{
+		stage.addChild(SpaceShip);
+		requestAnimFrame( animate );
+	}	
+	
+	
+	function animate() {
+		//check_hit();
+		check_zorg_hit();
+	    requestAnimFrame( animate );
+		if(motion){
+		
+		
+	
+	    for(var i = 0 ; i<aliens.length; i++){
+		if (count<5){
+			aliens[i].position.y +=2;
+			}
+			else{aliens[i].position.y +=5;}
+		
+		
+		
+		}
+	   
+	   for(var i = 0 ; i<balls.length; i++){
+			balls[i].position.y -=10;
+		}
+		}
+		else
+		{ 
+		for(var i = 0 ; i<aliens.length; i++){
+		if (count<5){
+			aliens[i].position.y =2;
+			}
+			else{aliens[i].position.y =5;}
+		
+		
+		
+		}
+	   
+	   for(var i = 0 ; i<balls.length; i++){
+			balls[i].position.y -=10;
+		}
+		
+		
+		}
+		
+	    renderer.render(stage);
+		
+	}
+	
+	
+	function check_hit()
+	{
+		
+		
+		for(var i=0;i<balls.length;i++)
+		{
+			
+			var b=balls[i];
+			for(var j=0;j<aliens.length;j++)
+			{
+			var a=aliens[j];
+		
+		     
+		     
+			 /*if((b.position.x < (a.position.x + a.width)) && ((b.position.x + b.width) > a.position.x) &&
+			 (b.position.y < (a.position.y + a.height)) &&
+			 ((b.position.y + b.height) > a.position.y))
+			 {
+			 
+			 stage.removeChild(balls[i]);
+						stage.removeChild(aliens[j]);
+						aliens.splice(j,1);
+						balls.splice(i,1);
+			 
+			 }*/
+			
+			
+			
+			
+			if((balls[i].position.x - balls[i].width/8 <=aliens[j].position.x + aliens[j].width/8)
+			&&(aliens[j].position.x - aliens[j].width/8<=balls[i].position.x+balls[i].width/8) 
+			&& (balls[i].position.y - balls[i].height/8<=aliens[j].position.y + aliens[j].height/8)
+			/*&&(aliens[j].position.y<=balls[i].height/8+balls[i].position.y)*/){
+						var boom = new PIXI.Sprite(explosion);
+						boom.anchor.x = 0.5;
+						boom.anchor.y = 0.5;
+						boom.position.x = aliens[i].position.x;
+						boom.position.y = aliens[i].position.y;
+						stage.addChild(boom);
+						stage.removeChild(balls[i]);
+						stage.removeChild(aliens[j]);
+						aliens.splice(j,1);
+						balls.splice(i,1);
+						count++;
+		}
+		
+			}
+		}
+		
+		
+	}
+	
+	function check_zorg_hit(){
+		for ( var i=0 ; i<aliens.length ; i++ ){
+			if((aliens[i].position.x + aliens[i].width/8>=SpaceShip.position.x - SpaceShip.width/32)
+			&&(aliens[i].position.x - aliens[i].width/8<=SpaceShip.position.x+SpaceShip.width/32) 
+			&& (aliens[i].position.y + aliens[i].height/8>=SpaceShip.position.y - SpaceShip.height/32)
+			&&(aliens[i].position.y - aliens[i].height/8<=SpaceShip.position.y+SpaceShip.height/32)){
+				stage.removeChild(aliens[i]);
+				aliens.splice(i,1);
+				lives--;
+				if ( lives == 0 ){
+					alert("game over");
+					reset();
+				}
+			}
+		}
+	}
+	setInterval(check_hit,1);
+
+	 function reset(){
+			for ( var i = 0 ; i < aliens.length ; i++ ){
+				stage.removeChild(aliens[i]);
+			}
+			
+			for ( var i = 0 ; i < balls.length ; i++ ){
+				stage.removeChild(balls[i]);
+			}
+			lives = 3;
+			loader.load();
+	   }
+
+	</script>
+
+	</body>
+</html>
